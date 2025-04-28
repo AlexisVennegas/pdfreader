@@ -1,0 +1,94 @@
+---
+import homePng from "../assets/home.png";
+import { Image } from "astro:assets";
+import PdfImage from "../assets/pdf.png";
+---
+
+<header>
+    <nav>
+        <ul>
+            <li>
+                <a href="/">
+                    <Image
+                        src={homePng}
+                        alt="A bird sitting on a nest of eggs."
+                    />
+                </a>
+            </li>
+            <li>
+                <a href="/Load">
+                    <button>
+                        <Image
+                            src={PdfImage}
+                            alt="A bird sitting on a nest of eggs."
+                        />
+                    </button>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<style>
+    header {
+        border: 1px solid purple;
+        width: 100%;
+        height: 15%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    ul {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    li {
+        margin: 0 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    li:nth-child(1) {
+        margin-right: 150px;
+    }
+    a {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+    }
+    a:hover {
+        color: purple;
+    }
+    img {
+        width: 50px;
+        height: 50px;
+    }
+    img:hover {
+        transform: scale(1.1);
+        transition: transform 0.2s;
+    }
+    button {
+        width: 230px;
+        height: 100px;
+        background-color: #316fbf;
+        border-radius: 15px;
+        color: white;
+        border: none;
+        font-size: 20px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    button:hover {
+        background-color: #2a5f9e;
+        cursor: pointer;
+    }
+</style>
