@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados del Análisis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f8;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .empresa-lista {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .empresa-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        .empresa-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mb-4">Empresas detectadas en las páginas seleccionadas</h1>
+
+        {% if empresas_result %}
+        <div class="alert alert-success" role="alert">
+            Se encontraron empresas en el PDF.
+        </div>
+        <pre style="white-space: pre-wrap;">{{ empresas_lista }}</pre>
+        
+        {% else %}
+        <pre style="white-space: pre-wrap;">{{ response }}</pre>
+        <div class="alert alert-danger" role="alert">
+            No se encontraron empresas o hubo un error en el análisis.
+        </div>
+        {% endif %}
+
+
+        <h2>Resultados del Scraping</h2>
+        <ul>
+            {% for item in scraping_result %}
+            <li>
+
+                <strong>{{ item.empresa }}</strong>:
+                {% if item.url %}
+                <a href="{{ url_for('static', filename='downloads/' + item.archivo) }}">Descargar PDF</a>
+                (Fuente: <a href="{{ item.url }}" target="_blank">link</a>)
+                {% else %}
+                {{ item.mensaje }}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+
+        <!-- 
+        {% if empresas %}
+        <div class="empresa-lista">
+            {% for empresa in empresas %}
+                <div class="empresa-item">{{ empresa }}</div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No se encontraron empresas o hubo un error en el análisis.</p>
+        {% endif %}
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+        {% endif %} -->
+
+        <a href="/" class="btn btn-primary mt-4">Volver a subir otro PDF</a>
+    </div>
+</body>
+
+</html>

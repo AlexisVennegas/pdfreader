@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Previa del PDF</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="./style/index.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .pdf-preview {
+            background-color: #e9ecef;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+            border-radius: 4px;
+            margin-top: 20px;
+            max-width: 100%;
+        }
+
+        .pdf-preview .page-container {
+            position: relative;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pdf-preview img {
+            margin-bottom: 10px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .page-title {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .selected {
+            border: 5px solid green !important;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Formulario para subir el PDF -->
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="file" class="form-label">Selecciona un archivo PDF:</label>
+                <input type="file" name="file" class="form-control" accept=".pdf" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Subir y procesar</button>
+            {% if images %}
+    <button type="button" class="btn btn-success me-2" onclick="selectAllPages()">Seleccionar todas</button>
+    <button type="button" class="btn btn-secondary" onclick="deselectAllPages()">Deseleccionar todas</button>
+{% endif %}
+
+        </form>
+
+        {% if images %}
+        <!-- Mostrar las imágenes de las páginas del PDF -->
+        <div class="pdf-preview">
+            {% for image in images %}
+                <div class="page-container" onclick="toggleSelectPage(this)">
+                    <div class="page-title">Página {{ loop.index }}</div>
+                    <img src="{{ url_for('static', filename=image) }}" class="img-fluid" alt="Vista previa del PDF">
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% if images %}
+
+
+<!-- Botón para procesar selección -->
+<div class="text-center mt-4">
+    <button class="btn btn-success" onclick="procesarSeleccion()">Procesar selección</button>
+</div>
+
+<!-- Guardamos el nombre del archivo original en un atributo oculto -->
+<input type="hidden" id="pdfFilename" value="{{ filename }}">
+{% endif %}
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleSelectPage(element) {
+            // Alternar la clase 'selected' al hacer clic
+            element.classList.toggle('selected');
+        }
+        function procesarSeleccion() {
+        const selectedElements = document.querySelectorAll('.page-container.selected');
+        const selectedPages = Array.from(selectedElements).map(el => parseInt(el.dataset.page));
+        const filename = document.getElementById('pdfFilename').value;
+
+        if (selectedPages.length === 0) {
+            alert("Selecciona al menos una página.");
+            return;
+        }
+
+        fetch('/resultados', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ pages: selectedPages, filename })
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.open();
+            document.write(html);
+            document.close();
+        })
+        .catch(error => {
+            console.error('Error al procesar:', error);
+            alert('Hubo un error procesando las páginas.');
+        });
+    }
+    function selectAllPages() {
+    document.querySelectorAll('.page-container').forEach(el => el.classList.add('selected'));
+}
+
+function deselectAllPages() {
+    document.querySelectorAll('.page-container').forEach(el => el.classList.remove('selected'));
+}
+
+    </script>
+</body>
+</html>
+AIzaSyAGIL6CBu3QFizVKmpuPKhpQfRuDJJIE1U
