@@ -1,0 +1,21 @@
+# Entorno virtual
+venv/
+env/
+.venv/
+.venv_pdf/
+
+# Archivos del sistema
+__pycache__/
+*.py[cod]
+*.log
+
+# Archivos del editor
+.vscode/
+.idea/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de Python
+*.egg-info/
