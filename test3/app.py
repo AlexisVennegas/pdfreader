@@ -30,7 +30,7 @@ app.config["ALLOWED_EXTENSIONS"] = ALLOWED_EXTENSIONS
 
 # Configurar Gemini
 try:
-    GOOGLE_API_KEY = "AIzaSyAGIL6CBu3QFizVKmpuPKhpQfRuDJJIE1U"
+    GOOGLE_API_KEY = ""
     if not GOOGLE_API_KEY:
         raise ValueError("La variable de entorno GOOGLE_API_KEY no está definida.")
     genai.configure(api_key=GOOGLE_API_KEY)
