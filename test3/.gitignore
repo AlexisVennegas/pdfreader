@@ -3,7 +3,10 @@ venv/
 env/
 .venv/
 .venv_pdf/
-
+.pdf_pdf
+.pdf_pdf/*
+static/*
+uploads/*
 # Archivos del sistema
 __pycache__/
 *.py[cod]

@@ -1,19 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vista Previa del PDF</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="./style/index.css">
     <style>
         body {
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        aside {
+            width: 250px;
+            background-color: #fff;
+            padding: 10px;
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
         }
 
         .container {
-            margin-top: 50px;
+            margin-top: 20px;
         }
 
         .pdf-preview {
@@ -53,94 +68,217 @@
         .selected {
             border: 5px solid green !important;
         }
+
+        .recent-item img {
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        .recent-sidebar {
+            width: 220px;
+            background-color: #ffffff;
+            border-right: 1px solid #dee2e6;
+            padding: 15px;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            float: left;
+            height: 100vh;
+        }
+
+
+        .recent-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .recent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .recent-item {
+            text-align: center;
+        }
+
+        .recent-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #495057;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .recent-thumb {
+            width: 100%;
+            max-height: 120px;
+            object-fit: contain;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+
+        .page-title {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            z-index: 10;
+            pointer-events: none;
+        }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container">
-        <!-- Formulario para subir el PDF -->
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="file" class="form-label">Selecciona un archivo PDF:</label>
-                <input type="file" name="file" class="form-control" accept=".pdf" required>
+    <aside class="recent-sidebar">
+        <h4 class="recent-title">Recientes</h4>
+        <div class="recent-list">
+            {% for preview in recent_previews %}
+            <div class="recent-item" onclick="loadRecentFolder('{{ preview.folder }}')">
+                <img src="{{ url_for('static', filename=preview.preview) }}" class="img-fluid"
+                    alt="Vista previa del PDF">
+                <p>{{ preview.folder }}</p>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Subir y procesar</button>
-            {% if images %}
-    <button type="button" class="btn btn-success me-2" onclick="selectAllPages()">Seleccionar todas</button>
-    <button type="button" class="btn btn-secondary" onclick="deselectAllPages()">Deseleccionar todas</button>
-{% endif %}
-
-        </form>
-
-        {% if images %}
-        <!-- Mostrar las imágenes de las páginas del PDF -->
-        <div class="pdf-preview">
-            {% for image in images %}
-                <div class="page-container" onclick="toggleSelectPage(this)">
-                    <div class="page-title">Página {{ loop.index }}</div>
-                    <img src="{{ url_for('static', filename=image) }}" class="img-fluid" alt="Vista previa del PDF">
-                </div>
+           
+            <hr class="my-2" style="border-top: 1px solid #ccc;">
             {% endfor %}
         </div>
-        {% endif %}
-    </div>
-    {% if images %}
+    </aside>
 
 
-<!-- Botón para procesar selección -->
-<div class="text-center mt-4">
-    <button class="btn btn-success" onclick="procesarSeleccion()">Procesar selección</button>
-</div>
-
-<!-- Guardamos el nombre del archivo original en un atributo oculto -->
-<input type="hidden" id="pdfFilename" value="{{ filename }}">
-{% endif %}
 
 
-    <!-- Bootstrap JS -->
+    <main>
+        <div class="container">
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="file" class="form-label">Selecciona un archivo PDF:</label>
+                    <input type="file" name="file" class="form-control" accept=".pdf" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Subir y procesar</button>
+                {% if images %}
+                <button type="button" class="btn btn-success me-2" onclick="selectAllPages()">Seleccionar todas</button>
+                <button type="button" class="btn btn-secondary" onclick="deselectAllPages()">Deseleccionar
+                    todas</button>
+                {% endif %}
+            </form>
+
+            {% if images %}
+            <div class="pdf-preview">
+                {% for image in images %}
+                <div class="page-container" onclick="toggleSelectPage(this)">
+                    <img src="{{ url_for('static', filename=image|replace('\\', '/') ) }}" class="img-fluid"
+                        alt="Vista previa del PDF">
+                    <div class="page-title">Página {{ loop.index }}</div>
+                </div>
+
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if images %}
+            <div class="text-center mt-4">
+                <button class="btn btn-success" onclick="procesarSeleccion()">Procesar selección</button>
+            </div>
+            <input type="hidden" id="pdfFilename" value="{{ filename }}">
+            {% endif %}
+        </div>
+    </main>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         function toggleSelectPage(element) {
-            // Alternar la clase 'selected' al hacer clic
             element.classList.toggle('selected');
         }
         function procesarSeleccion() {
-        const selectedElements = document.querySelectorAll('.page-container.selected');
-        const selectedPages = Array.from(selectedElements).map(el => parseInt(el.dataset.page));
-        const filename = document.getElementById('pdfFilename').value;
+            const selectedElements = document.querySelectorAll('.page-container.selected');
+            const selectedPages = Array.from(selectedElements).map(el => parseInt(el.dataset.page));
+            const filename = document.getElementById('pdfFilename').value;
 
-        if (selectedPages.length === 0) {
-            alert("Selecciona al menos una página.");
-            return;
+            if (selectedPages.length === 0) {
+                alert("Selecciona al menos una página.");
+                return;
+            }
+
+            fetch('/resultados', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ pages: selectedPages, filename })
+            })
+                .then(response => response.text())
+                .then(html => {
+                    document.open();
+                    document.write(html);
+                    document.close();
+                })
+                .catch(error => {
+                    console.error('Error al procesar:', error);
+                    alert('Hubo un error procesando las páginas.');
+                });
+        }
+        function selectAllPages() {
+            document.querySelectorAll('.page-container').forEach(el => el.classList.add('selected'));
+        }
+        function deselectAllPages() {
+            document.querySelectorAll('.page-container').forEach(el => el.classList.remove('selected'));
         }
 
-        fetch('/resultados', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ pages: selectedPages, filename })
-        })
-        .then(response => response.text())
-        .then(html => {
-            document.open();
-            document.write(html);
-            document.close();
-        })
-        .catch(error => {
-            console.error('Error al procesar:', error);
-            alert('Hubo un error procesando las páginas.');
-        });
-    }
-    function selectAllPages() {
-    document.querySelectorAll('.page-container').forEach(el => el.classList.add('selected'));
-}
+        function loadRecentPDF(folder) {
+            // Realizamos la solicitud para cargar las imágenes de ese PDF
+            fetch(`/load_recent_pdf/${folder}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Mostrar las imágenes en la pantalla principal
+                    const pdfContainer = document.querySelector(".pdf-preview");
+                    pdfContainer.innerHTML = "";  // Limpiar las imágenes previas
 
-function deselectAllPages() {
-    document.querySelectorAll('.page-container').forEach(el => el.classList.remove('selected'));
-}
+                    data.images.forEach(image => {
+                        const imgElement = document.createElement("img");
+                        imgElement.src = `/static/${image}`;
+                        imgElement.classList.add("img-fluid");
+                        pdfContainer.appendChild(imgElement);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al cargar el PDF reciente:", error);
+                    alert("Hubo un error al cargar el PDF.");
+                });
+        }
+        function loadRecentFolder(folder) {
+            // Hacer una solicitud GET con el nombre de la carpeta seleccionada
+            fetch(`/upload/${folder}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Limpiar las imágenes previas
+                    const pdfContainer = document.querySelector(".pdf-preview");
+                    pdfContainer.innerHTML = "";
+
+                    // Mostrar las imágenes de la carpeta seleccionada
+                    data.images.forEach(image => {
+                        const imgElement = document.createElement("img");
+                        imgElement.src = `/static/${image}`;
+                        imgElement.classList.add("img-fluid");
+                        pdfContainer.appendChild(imgElement);
+                    });
+
+                    // Actualizar el campo oculto con el nombre de la carpeta
+                    document.getElementById("pdfFilename").value = folder;
+                })
+                .catch(error => {
+                    console.error("Error al cargar el PDF:", error);
+                    alert("Hubo un error al cargar el PDF.");
+                });
+        }
 
     </script>
 </body>
+
 </html>
